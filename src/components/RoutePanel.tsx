@@ -70,7 +70,7 @@ const RoutePanel = ({
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed right-4 top-20 w-96 bg-white shadow-xl">
+    <Card className="fixed left-4 top-20 w-96 bg-white shadow-xl">
       <div className="p-4 space-y-4">
         {/* Main Route Info */}
         <div className="space-y-2">
