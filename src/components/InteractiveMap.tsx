@@ -71,6 +71,28 @@ const center = {
   lng: -118.5267,
 };
 
+const defaultWildfires: WildfireLocation[] = [
+    {
+      id: "fire1",
+      lat: 34.05723,
+      lng: -118.5267,
+      severity: "high",
+    },
+    {
+      id: "fire2",
+      lat: 34.0499,
+      lng: -118.5330,
+      severity: "medium",
+    },
+    {
+      id: "fire3",
+      lat: 34.0153,
+      lng: -118.4918,
+      severity: "low",
+    },
+  ];
+  
+
 // Dark red and black map style
 const mapStyles = [
   { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
@@ -133,14 +155,22 @@ const InteractiveMap = ({
           west: southWest.lng(),
         }).then((data) => {
           // console.log("Fetched wildfire data:", data);
-          setWildfireData(data);
+          const transformedData = data.map(item => ({
+            ...item,
+            acq_date: item.acq_date.toString(), // Convert acq_date to string
+            acq_time: item.acq_time.toString(), // Convert acq_time to string (if necessary)
+            satellite: item.satellite.toString(), // Convert satellite to string
+            // daynight: item.daynight.toString(), // Convert daynight to string
+          }));
+          setWildfireData(transformedData);
+          
+          
         });
       }
     };
 
     fetchInitialData();
 
-    map.addListener("bounds_changed", fetchInitialData);
   }, []);
 
   const findNearestSafeZone = React.useCallback(() => {
@@ -194,6 +224,18 @@ const InteractiveMap = ({
     }
   }, [isLoaded, findNearestSafeZone]);
 
+//   React.useEffect(() => {
+
+//     // For debugging purposes, use static wildfire data
+
+//     if (!wildfireData.length) {
+
+//       setWildfireData(defaultWildfires);
+
+//     }
+
+//   }, [wildfireData]);
+
   if (loadError) return <div>Error loading maps</div>;
   if (!isLoaded) return <div>Loading...</div>;
 
@@ -226,16 +268,17 @@ const InteractiveMap = ({
 
         {/* Wildfire Markers */}
         {activeLayers.includes("wildfires") &&
-          wildfireData.map((fire, index) => (
+          defaultWildfires.map((fire, index) => (
             <Marker
               key={`fire-${index}`}
-              position={{ lat: fire.latitude, lng: fire.longitude }}
+              position={{ lat: fire.lat, lng: fire.lng }}
               icon={{
                 url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
                 scaledSize: new google.maps.Size(32, 32),
               }}
             />
           ))}
+          
 
         {/* Safe Zone Markers */}
         {activeLayers.includes("safeZones") &&

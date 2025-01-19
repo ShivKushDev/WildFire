@@ -1,10 +1,12 @@
 import { parse } from "path";
 
 // @ts-nocheck
-const FIRMS_API_KEY = "fbf784a01bcbf8da048491630fe329ac";
+const FIRMS_API_KEY = "260f246b373f5bc1504b46e1075fa4a7";
 const FIRMS_BASE_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv/fbf784a01bcbf8da048491630fe329ac/LANDSAT_NRT/world/1";
 
 interface WildfireData{
+  lat: number | (() => number);
+  lng: number | (() => number);
   latitude: number;
   longitude: number;
   path: number;
@@ -16,7 +18,7 @@ interface WildfireData{
   acq_date: string;
   acq_time: string;
   satellite: string;
-  daynight: string;
+//   daynight: string;
 };
 
 const fetchWildfireData = async (bounds: {
@@ -52,9 +54,8 @@ const fetchWildfireData = async (bounds: {
           acq_date,
           acq_time,
           satellite,
-          daynight
         ] = line.split(",");
-
+      
         return {
           latitude: parseFloat(latitude),
           longitude: parseFloat(longitude),
@@ -64,12 +65,13 @@ const fetchWildfireData = async (bounds: {
           brightness: parseFloat(brightness),
           scan: parseFloat(scan),
           track: parseFloat(track),
-          acq_date: parseFloat(acq_date),
-          acq_time: parseFloat(acq_time),
-          satellite: parseFloat(satellite),
-          daynight: parseFloat(daynight)
+          acq_date: acq_date.trim(), // Ensure string format
+          acq_time: acq_time.trim(), // Ensure string format
+          satellite: satellite.trim(), // Ensure string format
+          
         };
       });
+      
       console.log(wildfires);
       
     return wildfires;
