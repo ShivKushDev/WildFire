@@ -1,7 +1,7 @@
 import { parse } from "path";
 
 // @ts-nocheck
-const FIRMS_API_KEY = "260f246b373f5bc1504b46e1075fa4a7";
+const FIRMS_API_KEY = "(add your API key here)";
 const FIRMS_BASE_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv/fbf784a01bcbf8da048491630fe329ac/LANDSAT_NRT/world/1";
 
 interface WildfireData{
