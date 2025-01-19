@@ -108,9 +108,10 @@ const InteractiveMap = ({
   const [directions, setDirections] =
     React.useState<google.maps.DirectionsResult | null>(null);
 
+  const libraries = React.useMemo<("places")[]>(() => ["places"], []);
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "AIzaSyCrsyUYCHuEtrBJRxyDAReJ1Gy2R6gf-Zs",
-    libraries: ["places"],
+    libraries: libraries,
   });
 
   const mapRef = React.useRef<google.maps.Map>();
@@ -120,16 +121,26 @@ const InteractiveMap = ({
     mapRef.current = map;
     directionsService.current = new google.maps.DirectionsService();
 
-    // Initial load of wildfire data
-    fetchWildfireData({
-      north: 34.1459, // Expanded bounds around Palisades
-      south: 33.9459,
-      east: -118.4267,
-      west: -118.6267,
-    }).then((data) => {
-      console.log("Fetched wildfire data:", data);
-      setWildfireData(data);
-    });
+    const fetchInitialData = () => {
+      const bounds = map.getBounds();
+      if (bounds) {
+        const northEast = bounds.getNorthEast();
+        const southWest = bounds.getSouthWest();
+        fetchWildfireData({
+          north: northEast.lat(),
+          south: southWest.lat(),
+          east: northEast.lng(),
+          west: southWest.lng(),
+        }).then((data) => {
+          console.log("Fetched wildfire data:", data);
+          setWildfireData(data);
+        });
+      }
+    };
+
+    fetchInitialData();
+
+    map.addListener("bounds_changed", fetchInitialData);
   }, []);
 
   const findNearestSafeZone = React.useCallback(() => {
@@ -220,7 +231,7 @@ const InteractiveMap = ({
               key={`fire-${index}`}
               position={{ lat: fire.latitude, lng: fire.longitude }}
               icon={{
-                url: "https://maps.google.com/mapfiles/ms/icons/firedepartment.png",
+                url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
                 scaledSize: new google.maps.Size(32, 32),
               }}
             />

@@ -1,6 +1,6 @@
 // @ts-nocheck
 const FIRMS_API_KEY = "fbf784a01bcbf8da048491630fe329ac";
-const FIRMS_BASE_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv";
+const FIRMS_BASE_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv/fbf784a01bcbf8da048491630fe329ac/LANDSAT_NRT/world/1";
 
 type WildfireData = {
   latitude: number;
@@ -20,9 +20,16 @@ const fetchWildfireData = async (bounds: {
   west: number;
 }) => {
   try {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
     const response = await fetch(
-      `${FIRMS_BASE_URL}/${FIRMS_API_KEY}/MODIS_NRT/world/${bounds.north}/${bounds.south}/${bounds.east}/${bounds.west}/1/2024-01-18`,
+      `${FIRMS_BASE_URL}/${formattedDate}/${bounds.north}/${bounds.south}/${bounds.east}/${bounds.west}/1`,
     );
+    console.log(response);
     const text = await response.text();
 
     // Parse CSV
@@ -36,8 +43,8 @@ const fetchWildfireData = async (bounds: {
           brightness,
           scan,
           track,
-          acq_date,
           acq_time,
+          acq_date,
           confidence,
         ] = line.split(",");
 
