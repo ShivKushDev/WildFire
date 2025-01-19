@@ -1,16 +1,22 @@
+import { parse } from "path";
+
 // @ts-nocheck
 const FIRMS_API_KEY = "fbf784a01bcbf8da048491630fe329ac";
 const FIRMS_BASE_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv/fbf784a01bcbf8da048491630fe329ac/LANDSAT_NRT/world/1";
 
-type WildfireData = {
+interface WildfireData{
   latitude: number;
   longitude: number;
+  path: number;
+  row: number;
   confidence: number;
   brightness: number;
   scan: number;
   track: number;
   acq_date: string;
   acq_time: string;
+  satellite: string;
+  daynight: string;
 };
 
 const fetchWildfireData = async (bounds: {
@@ -18,7 +24,7 @@ const fetchWildfireData = async (bounds: {
   south: number;
   east: number;
   west: number;
-}) => {
+}) => { 
   try {
     const currentDate = new Date();
     const year = currentDate.getFullYear();
@@ -29,39 +35,46 @@ const fetchWildfireData = async (bounds: {
     const response = await fetch(
       `${FIRMS_BASE_URL}/${formattedDate}/${bounds.north}/${bounds.south}/${bounds.east}/${bounds.west}/1`,
     );
-    console.log(response);
-    const text = await response.text();
+    const textRes = await response.text();
 
     // Parse CSV
-    const lines = text.split("\n").slice(1); // Remove header
-    const wildfires = lines
-      .filter((line) => line.trim())
-      .map((line) => {
+    const lines = textRes.split("\n").slice(1); // Remove header
+    const wildfires = lines.filter((line) => line.trim()).map((line) => {
         const [
           latitude,
           longitude,
+          path,
+          row,
+          confidence,
           brightness,
           scan,
           track,
-          acq_time,
           acq_date,
-          confidence,
+          acq_time,
+          satellite,
+          daynight
         ] = line.split(",");
 
         return {
           latitude: parseFloat(latitude),
           longitude: parseFloat(longitude),
+          path: parseFloat(path),
+          row: parseFloat(row),
+          confidence: parseFloat(confidence),
           brightness: parseFloat(brightness),
           scan: parseFloat(scan),
           track: parseFloat(track),
-          acq_date,
-          acq_time,
-          confidence: parseFloat(confidence),
+          acq_date: parseFloat(acq_date),
+          acq_time: parseFloat(acq_time),
+          satellite: parseFloat(satellite),
+          daynight: parseFloat(daynight)
         };
       });
-
+      console.log(wildfires);
+      
     return wildfires;
-  } catch (error) {
+
+  } catch(error) {
     console.error("Error fetching wildfire data:", error);
     return [];
   }

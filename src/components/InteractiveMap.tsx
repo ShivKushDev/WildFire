@@ -106,7 +106,7 @@ const InteractiveMap = ({
   const [trafficEnabled, setTrafficEnabled] = React.useState(true);
   const [wildfireData, setWildfireData] = React.useState<WildfireData[]>([]);
   const [directions, setDirections] =
-    React.useState<google.maps.DirectionsResult | null>(null);
+    React.useState< google.maps.DirectionsResult | null>(null);
 
   const libraries = React.useMemo<("places")[]>(() => ["places"], []);
   const { isLoaded, loadError } = useLoadScript({
@@ -132,7 +132,7 @@ const InteractiveMap = ({
           east: northEast.lng(),
           west: southWest.lng(),
         }).then((data) => {
-          console.log("Fetched wildfire data:", data);
+          // console.log("Fetched wildfire data:", data);
           setWildfireData(data);
         });
       }
